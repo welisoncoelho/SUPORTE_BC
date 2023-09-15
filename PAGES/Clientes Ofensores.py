@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import openpyxl as op
+
 
 # Carregar os dados do arquivo Excel
 df = pd.read_csv("CHAMADOS_FRANQUIA.csv", encoding="utf-8")
