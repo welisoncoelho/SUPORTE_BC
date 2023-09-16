@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 # Carregar os dados do arquivo Excel
 df = pd.read_csv("CHAMADOS_FRANQUIA.csv", encoding="utf-8", dayfirst=True, parse_dates=["Data de abertura", "Data de fechamento", "Data Final SLA Violado"])
@@ -24,7 +25,7 @@ media_registros = count_dias.mean()
 st.sidebar.markdown("# Menu de Navegação")
 
 # Add links to different pages
-selected_page = st.sidebar.selectbox("Selecione a página desejada:", ["Análise Chamados", "Página Analistas","Página Clientes Ofensores"])
+selected_page = st.sidebar.selectbox("Selecione a página desejada:", ["Análise Chamados", "Página Analistas","Página Clientes Ofensores","Contato de Clientes"])
 
 # Main content
 st.markdown("#📊 RCA BC CONSULTÓRIA📊")
@@ -109,7 +110,7 @@ elif selected_page == "Página Analistas":
 
        # Filtros para "Unidade de Negócio" e "Nome da conta"
        selected_unidade_negocio_2 = st.selectbox("Selecione a Unidade de Negócio", ['Todos'] + list(df['Unidade de Negócio'].unique()))
-       selected_nome_conta_2 = st.selectbox("Selecione o Nome da Conta", ['Todos'] + list(df['Nome da conta'].unique()))
+       selected_nome_conta_2 = st.selectbox("Selecione o Analista", ['Todos'] + list(df['Alias do proprietário do caso'].unique()))
 
        # Filtros para data inicial e final
        selected_data_inicial = st.date_input("Selecione a Data Inicial")
@@ -120,7 +121,7 @@ elif selected_page == "Página Analistas":
        if selected_unidade_negocio_2 != 'Todos':
               filtered_df = filtered_df[filtered_df['Unidade de Negócio'] == selected_unidade_negocio_2]
        if selected_nome_conta_2 != 'Todos':
-              filtered_df = filtered_df[filtered_df['Nome da conta'] == selected_nome_conta_2]
+              filtered_df = filtered_df[filtered_df['Alias do proprietário do caso'] == selected_nome_conta_2]
        if selected_data_inicial and selected_data_final:
               filtered_df = filtered_df[(filtered_df['Data de fechamento'].dt.date >= selected_data_inicial) &
                                    (filtered_df['Data de fechamento'].dt.date <= selected_data_final)]
@@ -200,90 +201,126 @@ elif selected_page == "Página Clientes Ofensores":
 
 
 
-    # Converta a coluna 'Data de abertura' para o formato de data e hora
        # Converta a coluna 'Data de abertura' para o formato de data e hora
-df['Data de abertura'] = pd.to_datetime(df['Data de abertura'], format="%d/%m/%Y")
+              # Converta a coluna 'Data de abertura' para o formato de data e hora
+    df['Data de abertura'] = pd.to_datetime(df['Data de abertura'], format="%d/%m/%Y")
 
-# Filtros para "Unidade de Negócio" e "Nome da conta"
-selected_unidade_negocio_3 = st.selectbox("Selecione a Unidade de Negócio", ['Todos'] + list(df['Unidade de Negócio'].unique()), key="clientes_unidade_negocio")
-selected_nome_conta_3 = st.selectbox("Selecione o Nome da Conta", ['Todos'] + list(df['Nome da conta'].unique()), key="clientes_nome_conta")
+       # Filtros para "Unidade de Negócio" e "Nome da conta"
+    selected_unidade_negocio_3 = st.selectbox("Selecione a Unidade de Negócio", ['Todos'] + list(df['Unidade de Negócio'].unique()), key="clientes_unidade_negocio")
+    selected_nome_conta_3 = st.selectbox("Selecione o Nome da Conta", ['Todos'] + list(df['Nome da conta'].unique()), key="clientes_nome_conta")
 
-# Filtros para data inicial e final
-selected_data_inicial = st.date_input("Selecione a Data Inicial", key="data_inicial_clientes_ofensores")
-selected_data_final = st.date_input("Selecione a Data Final",key="data_final_clientes_ofensores")
+       # Filtros para data inicial e final
+    selected_data_inicial = st.date_input("Selecione a Data Inicial", key="data_inicial_clientes_ofensores")
+    selected_data_final = st.date_input("Selecione a Data Final",key="data_final_clientes_ofensores")
 
-# Aplicar os filtros
-filtered_df = df.copy()  # Crie uma cópia do DataFrame original
-if selected_unidade_negocio_3 != 'Todos':
-    filtered_df = filtered_df[filtered_df['Unidade de Negócio'] == selected_unidade_negocio_3]  # Corrigido para usar selected_unidade_negocio_3
-if selected_nome_conta_3 != 'Todos':
-    filtered_df = filtered_df[filtered_df['Nome da conta'] == selected_nome_conta_3]  # Corrigido para usar selected_nome_conta_3
-if selected_data_inicial and selected_data_final:
-    filtered_df = filtered_df[(filtered_df['Data de abertura'].dt.date >= selected_data_inicial) &
-                              (filtered_df['Data de abertura'].dt.date <= selected_data_final)]
-
-
-# Calcular a média de chamados por unidade de negócio
-media_por_unidade = filtered_df.groupby('Unidade de Negócio')['Nome da conta'].count().mean()
-
-
-# Mostre o total de registros
-total_registros = filtered_df.shape[0]
-st.write("Total de Registros:", total_registros, font=("arial", 24))
-
-# Contar o número de vezes que o nome da conta aparece no DataFrame
-count = filtered_df['Nome da conta'].value_counts()
-count_dias = filtered_df['Data de abertura'].value_counts()
-
-# Calcular a média de registros por "Data de abertura"
-media_registros = count_dias.mean()
-
-st.title("Ofensores/clientes")
-
-# Crie duas colunas na mesma linha
-col1, col2 = st.columns(2)
-
-# Plote o gráfico de barras na primeira coluna
-col1.bar_chart(count)
-
-# Exiba a tabela na segunda coluna (abaixo da primeira)
-col2.line_chart(count_dias)
-
-# Exiba a média de registros em um card
-st.write("Média de registros por Data de Abertura:", f"{media_registros:.2f}")
-
-# Contar o número de vezes que o nome da conta aparece no DataFrame
-count = filtered_df['Unidade de Negócio'].value_counts()
-count_dias = filtered_df['Data de abertura'].value_counts()
-
-# Contar o número de vezes que o Nível 1 aparece no DataFrame
-count_nivel1 = filtered_df['Nível 1'].value_counts()
-count_nivel_3 = filtered_df['Nível 2'].value_counts()
-count_nivel_5 = filtered_df['Nível 5'].value_counts()
-count_clientes= filtered_df['Nome da conta'].value_counts()
-count_contato= filtered_df['Nome do contato'].value_counts()
+       # Aplicar os filtros
+    filtered_df = df.copy()  # Crie uma cópia do DataFrame original
+    if selected_unidade_negocio_3 != 'Todos':
+      filtered_df = filtered_df[filtered_df['Unidade de Negócio'] == selected_unidade_negocio_3]  # Corrigido para usar selected_unidade_negocio_3
+    if selected_nome_conta_3 != 'Todos':
+       filtered_df = filtered_df[filtered_df['Nome da conta'] == selected_nome_conta_3]  # Corrigido para usar selected_nome_conta_3
+    if selected_data_inicial and selected_data_final:
+       filtered_df = filtered_df[(filtered_df['Data de abertura'].dt.date >= selected_data_inicial) &
+                                   (filtered_df['Data de abertura'].dt.date <= selected_data_final)]
+       # Calcular a média de chamados por unidade de negócio
+       media_por_unidade = filtered_df.groupby('Unidade de Negócio')['Nome da conta'].count().mean()
 
 
+       # Mostre o total de registros
 
-st.table(count_clientes)
+       total_registros = filtered_df.shape[0]
+       st.write("Total de Registros:", total_registros, font=("arial", 24))
 
-# Exiba a tabela de contagem de registros
-st.markdown("## Chamados por Unidade de Negócio")
-st.table(count)
+       # Contar o número de vezes que o nome da conta aparece no DataFrame
+       count = filtered_df['Nome da conta'].value_counts()
+       count_dias = filtered_df['Data de abertura'].value_counts()
 
-st.markdown("## Chamados Fila")
-st.table(count_nivel1)
+       # Calcular a média de registros por "Data de abertura"
+       media_registros = count_dias.mean()
 
-st.markdown("## Chamados Módulos")
-st.table(count_nivel_3)
+       st.title("Ofensores/clientes")
 
-st.markdown("## Ofensores")
-st.table(count_nivel_5)
+       # Crie duas colunas na mesma linha
+       col1, col2 = st.columns(2)
 
-# Exiba a tabela de contagem de registros
-st.table(count)
+       # Plote o gráfico de barras na primeira coluna
+       col1.bar_chart(count)
 
+       # Exiba a tabela na segunda coluna (abaixo da primeira)
+       col2.line_chart(count_dias)
 
-# Exiba a tabela de contagem contatos
-st.title("Relação de Contatos")
-st.table(count_contato)
+       # Exiba a média de registros em um card
+       st.write("Média de registros por Data de Abertura:", f"{media_registros:.2f}")
+
+       # Contar o número de vezes que o nome da conta aparece no DataFrame
+       count = filtered_df['Unidade de Negócio'].value_counts()
+       count_dias = filtered_df['Data de abertura'].value_counts()
+
+       # Contar o número de vezes que o Nível 1 aparece no DataFrame
+       count_nivel1 = filtered_df['Nível 1'].value_counts()
+       count_nivel_3 = filtered_df['Nível 2'].value_counts()
+       count_nivel_5 = filtered_df['Nível 5'].value_counts()
+       count_clientes= filtered_df['Nome da conta'].value_counts()
+       count_contato= filtered_df['Nome do contato'].value_counts()
+       count_uf =filtered_df ['Estado'].value_counts()
+
+       st.markdown("# Acionamento por Estado")
+       st.bar_chart(count_uf)
+
+       st.table(count_clientes)
+
+ 
+
+       # Exiba a tabela de contagem de registros
+
+       st.markdown("## Chamados por Unidade de Negócio")
+       st.table(count)
+       st.markdown("## Chamados Fila")
+       st.table(count_nivel1)
+       st.markdown("## Chamados Módulos")
+       st.table(count_nivel_3)
+       st.markdown("## Ofensores")
+       st.table(count_nivel_5)
+       # Exiba a tabela de contagem de registros
+       st.table(count)
+       # Exiba a tabela de contagem contatos
+       st.title("Relação de Contatos")
+       st.table(count_contato)
+
+       
+
+elif selected_page == "Contato de Clientes":
+    st.title("Relação de Clientes")
+
+    # Converta a coluna 'Data de abertura' para o formato de data e hora
+    df['Data de abertura'] = pd.to_datetime(df['Data de abertura'], format="%d/%m/%Y")
+
+    # Filtros para "Unidade de Negócio" e "Nome da conta"
+    selected_unidade_negocio_3 = st.selectbox("Selecione a Unidade de Negócio", ['Todos'] + list(df['Unidade de Negócio'].unique()), key="clientes_unidade_negocio")
+    selected_nome_conta_3 = st.selectbox("Selecione o Nome da Conta", ['Todos'] + list(df['Nome da conta'].unique()), key="clientes_nome_conta")
+
+    # Filtro para o Estado
+    selected_estado = st.selectbox("Selecione o Estado", ['Todos'] + list(df['Estado'].unique()), key="clientes_estado")
+
+    # Filtros para data inicial e final
+    selected_data_inicial = st.date_input("Selecione a Data Inicial", key="data_inicial_clientes_ofensores")
+    selected_data_final = st.date_input("Selecione a Data Final",key="data_final_clientes_ofensores")
+
+    # Aplicar os filtros
+    filtered_df = df.copy()  # Crie uma cópia do DataFrame original
+
+    if selected_unidade_negocio_3 != 'Todos':
+        filtered_df = filtered_df[filtered_df['Unidade de Negócio'] == selected_unidade_negocio_3]
+
+    if selected_nome_conta_3 != 'Todos':
+        filtered_df = filtered_df[filtered_df['Nome da conta'] == selected_nome_conta_3]
+
+    if selected_estado != 'Todos':
+        filtered_df = filtered_df[filtered_df['Estado'] == selected_estado]
+
+    if selected_data_inicial and selected_data_final:
+        filtered_df = filtered_df[(filtered_df['Data de abertura'].dt.date >= selected_data_inicial) &
+                                   (filtered_df['Data de abertura'].dt.date <= selected_data_final)]
+
+    columns = ['Nome da conta', 'Nome do contato', 'Contato: Email', 'Contato: Telefone', 'Estado']
+    st.dataframe(filtered_df[columns], width=1500, height=1500)
