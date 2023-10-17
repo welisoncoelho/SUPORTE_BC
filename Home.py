@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+from IPython.display import IFrame
 
 # Carregar os dados do arquivo Excel
 df = pd.read_csv("CHAMADOS_FRANQUIA.csv", encoding="utf-8", dayfirst=True, parse_dates=["Data de abertura", "Data de fechamento", "Data Final SLA Violado"])
@@ -8,7 +8,41 @@ df = pd.read_csv("CHAMADOS_FRANQUIA.csv", encoding="utf-8", dayfirst=True, parse
 # Filtrar o DataFrame (se necessário)
 filtered_df = df
 
-# a média de chamados por unidade de negócio
+# Define a session state variable to store authentication status
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+# Function to check password and set authentication status
+def check_password():
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if (
+            st.session_state["username"] in st.secrets["passwords"]
+            and st.session_state["password"]
+            == st.secrets["passwords"][st.session_state["username"]]
+        ):
+            st.session_state.authenticated = True
+            del st.session_state["password"]  # don't store username + password
+            del st.session_state["username"]
+        else:
+            st.session_state.authenticated = False
+
+    if not st.session_state.authenticated:
+        # First run or not authenticated, show inputs for username + password.
+        st.text_input("Username", on_change=password_entered, key="username")
+        st.text_input(
+            "Password", type="password", on_change=password_entered, key="password"
+        )
+        return False
+    else:
+        # Authenticated, allow access to the content
+        return True
+
+# Check password before displaying any content
+if not check_password():
+    st.warning("Authentication failed. Please enter valid credentials.")
+    st.stop()  # Stop execution if not authenticated
+
 media_por_unidade = filtered_df.groupby('Unidade de Negócio')['Nome da conta'].count().mean()
 
 # Contar o número de vezes que o nome da conta aparece no DataFrame
@@ -25,7 +59,7 @@ media_registros = count_dias.mean()
 st.sidebar.markdown("# Menu de Navegação")
 
 # Add links to different pages
-selected_page = st.sidebar.selectbox("Selecione a página desejada:", ["Análise Chamados", "Página Analistas","Página Clientes Ofensores","Contato de Clientes"])
+selected_page = st.sidebar.selectbox("Selecione a página desejada:", ["Análise Chamados", "Página Analistas","Página Clientes Ofensores","Contato de Clientes","Bi Linx"])
 
 # Main content
 st.markdown("#📊 RCA BC CONSULTÓRIA📊")
@@ -324,3 +358,13 @@ elif selected_page == "Contato de Clientes":
 
     columns = ['Nome da conta', 'Nome do contato', 'Contato: Email', 'Contato: Telefone', 'Estado']
     st.dataframe(filtered_df[columns], width=1500, height=1500)
+
+elif selected_page == "BI LINX":
+    st.title("BI LINX")
+    import streamlit as st
+
+# URL do Power BI
+power_bi_url = "https://app.powerbi.com/view?r=eyJrIjoiODJkNGVhNGQtMDA2Zi00YmQ2LWIxYzMtN2E4OGE5Y2NlZWMwIiwidCI6ImM1OGY4NTY1LTdhYjQtNDQwZi04NGYyLWRkNzVmMzc0NWE2OSIsImMiOjR9"
+
+# Display the content of the IFrame using Streamlit
+st.write(f'<iframe width="800" height="600" src="{power_bi_url}"></iframe>', unsafe_allow_html=True)
