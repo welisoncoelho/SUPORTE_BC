@@ -361,10 +361,11 @@ elif selected_page == "Contato de Clientes":
 
 elif selected_page == "BI LINX":
     st.title("BI LINX")
-    import streamlit as st
+    
 
 # URL do Power BI
-power_bi_url = "https://app.powerbi.com/view?r=eyJrIjoiODJkNGVhNGQtMDA2Zi00YmQ2LWIxYzMtN2E4OGE5Y2NlZWMwIiwidCI6ImM1OGY4NTY1LTdhYjQtNDQwZi04NGYyLWRkNzVmMzc0NWE2OSIsImMiOjR9"
+iframe = IFrame = "https://app.powerbi.com/view?r=eyJrIjoiODJkNGVhNGQtMDA2Zi00YmQ2LWIxYzMtN2E4OGE5Y2NlZWMwIiwidCI6ImM1OGY4NTY1LTdhYjQtNDQwZi04NGYyLWRkNzVmMzc0NWE2OSIsImMiOjR9"
 
 # Display the content of the IFrame using Streamlit
-st.write(f'<iframe width="800" height="600" src="{power_bi_url}"></iframe>', unsafe_allow_html=True)
+st.write(f'<iframe width="800" height="600" src="{IFrame}"></iframe>', unsafe_allow_html=True)
+st.markdown(iframe)
