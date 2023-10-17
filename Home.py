@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-from IPython.display import IFrame
 
 # Carregar os dados do arquivo Excel
 df = pd.read_csv("CHAMADOS_FRANQUIA.csv", encoding="utf-8", dayfirst=True, parse_dates=["Data de abertura", "Data de fechamento", "Data Final SLA Violado"])
