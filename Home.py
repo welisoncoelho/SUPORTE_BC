@@ -364,7 +364,7 @@ elif selected_page == "BI LINX":
     
 
 # URL do Power BI
-iframe = IFrame = "https://app.powerbi.com/view?r=eyJrIjoiODJkNGVhNGQtMDA2Zi00YmQ2LWIxYzMtN2E4OGE5Y2NlZWMwIiwidCI6ImM1OGY4NTY1LTdhYjQtNDQwZi04NGYyLWRkNzVmMzc0NWE2OSIsImMiOjR9"
+iframe = "https://app.powerbi.com/view?r=eyJrIjoiODJkNGVhNGQtMDA2Zi00YmQ2LWIxYzMtN2E4OGE5Y2NlZWMwIiwidCI6ImM1OGY4NTY1LTdhYjQtNDQwZi04NGYyLWRkNzVmMzc0NWE2OSIsImMiOjR9"
 # Use HTML to embed the iframe
 
 st.markdown(
