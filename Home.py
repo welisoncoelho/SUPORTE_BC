@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 
+
 # Carregar os dados do arquivo Excel
 df = pd.read_csv("CHAMADOS_FRANQUIA.csv", encoding="utf-8", dayfirst=True, parse_dates=["Data de abertura", "Data de fechamento", "Data Final SLA Violado"])
 
@@ -62,6 +63,14 @@ selected_page = st.sidebar.selectbox("Selecione a página desejada:", ["Análise
 
 # Main content
 st.markdown("#📊 RCA BC CONSULTÓRIA📊")
+st.markdown ("""
+                 Metas Franquia
+                 - FCR - 75 % 👥
+                 - Aging : 30 dias 🎂
+                 - NPS-T  75 📞
+                 - SLA Geral : 90% 📊
+                 """)
+    
 
 if selected_page == "Análise Chamados":
        st.title("Dash Principal")
@@ -367,4 +376,5 @@ iframe = "https://app.powerbi.com/view?r=eyJrIjoiODJkNGVhNGQtMDA2Zi00YmQ2LWIxYzM
 # Use HTML to embed the iframe
 
 st.markdown(
+
 f'<iframe src="{iframe }" width="800" height="600"></iframe>', unsafe_allow_html=True)
