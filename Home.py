@@ -69,6 +69,7 @@ st.markdown ("""
                  - Aging : 30 dias 🎂
                  - NPS-T  75 📞
                  - SLA Geral : 90% 📊
+                 - Nivel de serviço 80% 📏
                  """)
     
 
